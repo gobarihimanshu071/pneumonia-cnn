@@ -65,8 +65,8 @@ class_weight = {0:1.0 , 1:1.5}
 history = model.fit(
     train_data,
     epochs=15,
-    validation_data=val_data
-    class_weight=class_weight,
+    validation_data=val_data,
+    class_weight=class_weight
 )
 
 
