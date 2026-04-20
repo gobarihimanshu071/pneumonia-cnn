@@ -4,6 +4,7 @@ import  matplotlib.pyplot as plt
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,
+    rotation_range=15,
     zoom_range=0.2,
     shear_range=0.2,
     horizontal_flip=True
@@ -28,17 +29,20 @@ val_data = val_datagen.flow_from_directory(
 )
 
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
 
 model = Sequential()
 
 model.add(Conv2D(32, (3,3), activation='relu' , input_shape=(224,224,1)))
+model.add(BatchNormalization())
 model.add(MaxPooling2D(2,2))
 
 model.add(Conv2D(64, (3,3), activation='relu'))
+model.add(BatchNormalization())
 model.add(MaxPooling2D(2,2))
 
 model.add(Conv2D(128, (3,3), activation='relu'))
+model.add(BatchNormalization())
 model.add(MaxPooling2D(2,2))
 
 model.add(Dropout(0.3))
@@ -56,10 +60,13 @@ model.compile(
     metrics=['accuracy']
 )
 
+class_weight = {0:1.0 , 1:1.5}
+
 history = model.fit(
     train_data,
-    epochs=10,
+    epochs=15,
     validation_data=val_data
+    class_weight=class_weight,
 )
 
 
