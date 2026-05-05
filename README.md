@@ -21,3 +21,18 @@ https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 1. Download dataset from Kaggle
 2. Place in `dataset/` folder
 3. Run:
+
+## Model Iterations
+
+### Version 1
+- Basic CNN
+- High overfitting
+
+### Version 2
+- Added BatchNorm, Dropout
+- Fixed evaluation using test set
+
+### Version 3
+- Applied class weighting
+- Tuned decision threshold
+- Improved confusion matrix performance
