@@ -5,14 +5,15 @@ from collections import Counter
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
+from tensorflow.keras.regularizers import l2
 
 
-TRAIN=True
+TRAIN=False
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,
-    rotation_range=10,
-    zoom_range=0.2,
+    rotation_range=15,
+    zoom_range=0.15,
     shear_range=0.2,
     horizontal_flip=True
 )
@@ -47,15 +48,15 @@ def build_model():
     model.add(BatchNormalization())
     model.add(MaxPooling2D(2,2))
 
-    model.add(Conv2D(64, (3,3), activation='relu'))
+    model.add(Conv2D(64, (3,3), activation='relu',kernel_regularizer=l2(0.0005)))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(2,2))
 
-    model.add(Conv2D(128, (3,3), activation='relu'))
+    model.add(Conv2D(128, (3,3), activation='relu', kernel_regularizer=l2(0.0005)))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(2,2))
 
-    model.add(Conv2D(256,(3,3),activation='relu'))
+    model.add(Conv2D(256,(3,3),activation='relu', kernel_regularizer=l2(0.0005)))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(2,2))
 
@@ -110,7 +111,7 @@ true_classes = val_data.classes
 
 
 
-thresholds = np.arange(0.1, 0.9, 0.05)
+thresholds = np.arange(0.1, 0.6, 0.05)
 
 for t in thresholds:
     preds = (predictions > t).astype(int)
