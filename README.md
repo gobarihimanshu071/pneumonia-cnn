@@ -40,3 +40,9 @@ https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 ## Confusion Matrix
 
 ![Confusion Matrix](images/confusion_matrix.png)
+
+## Grad-CAM Visualization
+
+The heatmap below shows the regions of the lungs the model focused on while predicting pneumonia.
+
+![GradCAM](images/gradcam.png)
