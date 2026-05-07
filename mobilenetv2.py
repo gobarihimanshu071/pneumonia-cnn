@@ -13,7 +13,7 @@ import numpy as np
 # CONTROL SWITCH
 # =========================================
 
-TRAIN = True
+TRAIN = False
 
 # =========================================
 # IMAGE SIZE + BATCH

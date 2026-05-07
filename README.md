@@ -36,3 +36,7 @@ https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 - Applied class weighting
 - Tuned decision threshold
 - Improved confusion matrix performance
+
+## Confusion Matrix
+
+![Confusion Matrix](images/confusion_matrix.png)
