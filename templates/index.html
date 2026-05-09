@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pneumonia Detection</title>
+</head>
+
+<body>
+    <h1>Pneumonia Detection usuing Deep Learning</h1>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+
+        <h2>Prediction: {{ prediction }}</h2>
+
+        <h3>Confidence: {{ confidence }}%</h3>
+
+    {% endif %}
+
+</body>
+</html>

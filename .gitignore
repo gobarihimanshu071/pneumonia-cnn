@@ -1,5 +1,6 @@
 venv/
 dataset/
 __pycache__/
+uploads/
 *.h5
 *.pyc
