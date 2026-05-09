@@ -46,3 +46,27 @@ https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 The heatmap below shows the regions of the lungs the model focused on while predicting pneumonia.
 
 ![GradCAM](images/gradcam_heatmap.png)
+
+## Model Comparison
+
+| Model | Accuracy | Notes |
+|------|------|------|
+| Custom CNN | ~65% | Built from scratch |
+| MobileNetV2 | ~89%+ | Transfer learning |
+
+## Tech Stack
+
+- Python
+- TensorFlow / Keras
+- Flask
+- OpenCV
+- MobileNetV2
+- Matplotlib
+- Seaborn
+
+## Future Improvements
+
+- Deploy publicly online
+- Add live Grad-CAM visualization
+- Improve frontend UI
+- Fine-tune MobileNetV2 layers
