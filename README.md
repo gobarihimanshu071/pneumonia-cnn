@@ -45,4 +45,4 @@ https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 
 The heatmap below shows the regions of the lungs the model focused on while predicting pneumonia.
 
-![GradCAM](images/gradcam.png)
+![GradCAM](images/gradcam_heatmap.png)
