@@ -2,8 +2,19 @@ from flask import Flask, render_template, request
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+from flask import send_from_directory
 import numpy as np
 import os
+import cv2
+import matplotlib.cm as cm
+import csv
+from datetime import datetime
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 app = Flask(__name__)
 
@@ -11,14 +22,93 @@ model = load_model("mobilenet_pneumonia.keras")
 
 IMG_SIZE = 224
 
+def generate_gradcam(img_array, model, last_conv_layer_name, save_path):
+
+    grad_model = tf.keras.models.Model(
+        inputs=model.input,
+        outputs=[
+            model.get_layer(last_conv_layer_name).output,
+            model.output
+        ]
+    )
+
+    with tf.GradientTape() as tape:
+
+        conv_outputs, predictions = grad_model(img_array)
+
+        loss = predictions[:, 0]
+
+    grads = tape.gradient(loss, conv_outputs)
+
+    pooled_grads = tf.reduce_mean(grads, axis=(0,1,2))
+
+    conv_outputs = conv_outputs[0]
+
+    heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
+
+    heatmap = tf.squeeze(heatmap)
+
+    heatmap = np.maximum(heatmap, 0)
+
+    heatmap /= np.max(heatmap)
+
+    # =====================================
+    # LOAD ORIGINAL IMAGE
+    # =====================================
+
+    img = cv2.imread(save_path)
+
+    img = cv2.resize(img, (224,224))
+
+    # =====================================
+    # CREATE HEATMAP
+    # =====================================
+
+    heatmap = cv2.resize(heatmap, (224,224))
+
+    heatmap = np.uint8(255 * heatmap)
+
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+    # =====================================
+    # OVERLAY
+    # =====================================
+
+    superimposed_img = heatmap * 0.4 + img
+
+    # =====================================
+    # SAVE RESULT
+    # =====================================
+
+    gradcam_path = "static/gradcam/gradcam.jpg"
+
+    cv2.imwrite(gradcam_path, superimposed_img)
+
+    return gradcam_path
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory('uploads', filename)
 
 @app.route('/predict', methods=['Post'])
 def predict():
 
     file = request.files['file']
+
+    if file.filename == "":
+        return render_template(
+            'index.html',
+            error="No file selected"
+        )
+    if not allowed_file(file.filename):
+        return render_template(
+            'index.html',
+            error="Only PNG/JPG/JPEG files allowed"
+        )
 
     file_path = os.path.join('uploads', file.filename)
 
@@ -36,6 +126,12 @@ def predict():
     img_array = np.expand_dims(img_array, axis = 0)
 
     prediction = model.predict(img_array)[0][0]
+    gradcam_path = generate_gradcam(
+    img_array,
+    model,
+    "Conv_1",
+    file_path
+)
 
     if prediction > 0.5 :
         result = "PNEUMONIA"
@@ -43,12 +139,26 @@ def predict():
         result = "NORMAL"
 
     confidence = round(float(prediction) * 100 , 2)
+    with open("history.csv","a",newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([
+            datetime.now(),
+            file.filename,
+            result,
+            confidence
+        ])
+
+
+    confidence_width = confidence
 
     return render_template(
-        'index.html',
-        prediction=result,
-        confidence = confidence
-    )
+    'index.html',
+    prediction=result,
+    confidence=confidence,
+    confidence_width=confidence_width,
+    image_path='/uploads/' + file.filename,
+    gradcam_path=gradcam_path
+)
 
 if __name__ == '__main__':
     app.run(debug=True)

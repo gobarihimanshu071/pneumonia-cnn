@@ -1,25 +1,333 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Pneumonia Detection</title>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pneumonia Detection AI</title>
+
+    <style>
+
+        @keyframes spin {
+
+0% {
+transform: rotate(0deg);
+}
+
+100% {
+transform: rotate(360deg);
+}
+
+}
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            height: 100vh;
+        }
+
+        .container {
+
+            background: #1e293b;
+
+            padding: 40px;
+
+            border-radius: 20px;
+
+            width: 400px;
+
+            text-align: center;
+
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+
+            margin: 20px 0;
+
+            color: white;
+        }
+
+        button {
+
+            background: #3b82f6;
+
+            border: none;
+
+            color: white;
+
+            padding: 12px 25px;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .custom-upload{
+
+display:inline-block;
+
+padding:15px 25px;
+
+background:#334155;
+
+border-radius:10px;
+
+cursor:pointer;
+
+margin-bottom:20px;
+
+transition:0.3s;
+
+}
+
+.custom-upload:hover{
+
+background:#475569;
+
+}
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        .result {
+
+            margin-top: 25px;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: #334155;
+        }
+
+        .prediction {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .confidence {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .progress-bar-fill {
+            background: #3b82f6;
+            padding: 10px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        img {
+
+            margin-top: 20px;
+
+            width: 250px;
+
+            border-radius: 10px;
+
+            border: 2px solid white;
+        }
+
+    </style>
+
 </head>
 
 <body>
-    <h1>Pneumonia Detection usuing Deep Learning</h1>
-    <form action="/predict" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required>
 
-        <button type="submit">Predict</button>
-    </form>
+    <div class="container">
 
-    {% if prediction %}
+        <h1>Pneumonia Detection AI</h1>
+        {% if error %}
+        <p style="color:red;font-weight:bold;">
+            {{error}}
+        </p>
+        {% endif %}
 
-        <h2>Prediction: {{ prediction }}</h2>
+        <form action="/predict" method="POST" enctype="multipart/form-data">
 
-        <h3>Confidence: {{ confidence }}%</h3>
+            <label for="file-upload" class="custom-upload">
+    Upload Chest X-ray
+</label>
+
+<input
+id="file-upload"
+type="file"
+name="file"
+required
+hidden
+onchange="previewImage(event)"
+>
+
+<p id="filename"></p>
+
+<img
+id="preview"
+style="
+display:none;
+width:220px;
+margin-top:15px;
+border-radius:10px;
+"
+>
+
+            <br>
+
+            <button type="submit" onclick="showLoader()">
+    Predict
+</button>
+
+<div id="loader" style="
+display:none;
+margin-top:20px;
+">
+
+<p>Analyzing X-ray...</p>
+
+<div style="
+border:5px solid #334155;
+border-top:5px solid #3b82f6;
+border-radius:50%;
+width:40px;
+height:40px;
+margin:auto;
+animation:spin 1s linear infinite;
+">
+</div>
+
+</div>
+
+        </form>
+
+        {% if prediction %}
+
+        <div class="result">
+
+    <div class="prediction">
+
+    {% if prediction=="PNEUMONIA" %}
+
+    <p style="color:red;">
+    Prediction: {{ prediction }}
+    </p>
+
+    {% else %}
+
+    <p style="color:lightgreen;">
+    Prediction: {{ prediction }}
+    </p>
 
     {% endif %}
 
+    </div>
+
+
+    <div class="confidence">
+        Confidence: {{ confidence }}%
+    </div>
+
+
+    <!-- PROGRESS BAR START -->
+
+    <div style="
+    width:100%;
+    background:#475569;
+    border-radius:20px;
+    margin-top:15px;
+    ">
+
+        <div style="
+        width: {{ confidence_width }}%;
+        background:#3b82f6;
+        padding:10px;
+        border-radius:20px;
+        text-align:center;
+        ">
+
+        {{ confidence }}%
+
+        </div>
+
+    </div>
+
+    <!-- PROGRESS BAR END -->
+
+
+    <img src="{{ image_path }}" alt="Uploaded X-ray">
+
+    <h3>Grad-CAM Visualization</h3>
+
+    <img src="{{ gradcam_path }}" alt="GradCAM">
+
+</div>
+
+        {% endif %}
+
+    </div>
+
+    <script>
+
+
+
+function showLoader(){
+
+document.getElementById(
+'loader'
+).style.display='block';
+
+}
+
+
+function previewImage(event){
+
+const file=event.target.files[0];
+
+document.getElementById(
+'filename'
+).innerText=file.name;
+
+
+const reader=new FileReader();
+
+reader.onload=function(){
+
+const img=document.getElementById(
+'preview'
+);
+
+img.src=reader.result;
+
+img.style.display='block';
+
+}
+
+reader.readAsDataURL(file);
+
+}
+
+
+</script>
+
 </body>
+
 </html>
