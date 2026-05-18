@@ -139,26 +139,30 @@ def predict():
         result = "NORMAL"
 
     confidence = round(float(prediction) * 100 , 2)
-    with open("history.csv","a",newline="") as file:
-        writer = csv.writer(file)
+    with open(
+        "history.csv",
+        mode="a",
+        newline="",
+        encoding="utf-8"
+    ) as history_file:
+        writer = csv.writer(history_file)
         writer.writerow([
-            datetime.now(),
+            str(datetime.now()),
             file.filename,
             result,
             confidence
         ])
 
-
     confidence_width = confidence
 
     return render_template(
-    'index.html',
-    prediction=result,
-    confidence=confidence,
-    confidence_width=confidence_width,
-    image_path='/uploads/' + file.filename,
-    gradcam_path=gradcam_path
-)
+        'index.html',
+        prediction=result,
+        confidence=confidence,
+        confidence_width=confidence_width,
+        image_path='/uploads/' + file.filename,
+        gradcam_path=gradcam_path
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

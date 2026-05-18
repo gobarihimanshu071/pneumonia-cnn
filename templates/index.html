@@ -149,6 +149,36 @@ background:#475569;
             border: 2px solid white;
         }
 
+        #drop-area{
+
+border:2px dashed #3b82f6;
+
+padding:30px;
+
+border-radius:15px;
+
+margin:20px 0;
+
+cursor:pointer;
+
+transition:0.3s;
+
+}
+
+
+#drop-area:hover{
+
+background:#334155;
+
+}
+
+
+#drop-area.highlight{
+
+background:#475569;
+
+}
+
     </style>
 
 </head>
@@ -168,6 +198,16 @@ background:#475569;
 
             <label for="file-upload" class="custom-upload">
     Upload Chest X-ray
+<div id="drop-area">
+
+<label for="file-upload">
+
+    <p>Drop Chest X-ray here</p>
+
+    <p>OR</p>
+
+    <p>Click to Upload</p>
+
 </label>
 
 <input
@@ -178,6 +218,9 @@ required
 hidden
 onchange="previewImage(event)"
 >
+
+</div>
+
 
 <p id="filename"></p>
 
@@ -287,8 +330,6 @@ animation:spin 1s linear infinite;
 
     <script>
 
-
-
 function showLoader(){
 
 document.getElementById(
@@ -325,6 +366,62 @@ reader.readAsDataURL(file);
 
 }
 
+
+const dropArea=document.getElementById(
+'drop-area'
+);
+
+
+dropArea.addEventListener(
+'dragover',
+(e)=>{
+
+e.preventDefault();
+
+dropArea.classList.add(
+'highlight'
+);
+
+}
+);
+
+
+dropArea.addEventListener(
+'dragleave',
+()=>{
+
+dropArea.classList.remove(
+'highlight'
+);
+
+}
+);
+
+
+dropArea.addEventListener(
+'drop',
+(e)=>{
+
+e.preventDefault();
+
+dropArea.classList.remove(
+'highlight'
+);
+
+const files=e.dataTransfer.files;
+
+document.getElementById(
+'file-upload'
+).files=files;
+
+previewImage({
+target:{
+files:files
+}
+});
+
+}
+);
 
 </script>
 
