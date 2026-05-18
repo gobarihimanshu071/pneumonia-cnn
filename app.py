@@ -141,12 +141,7 @@ def predict():
     img_array = np.expand_dims(img_array, axis = 0)
 
     prediction = model.predict(img_array)[0][0]
-    gradcam_path = generate_gradcam(
-    img_array,
-    model,
-    "Conv_1",
-    file_path
-)
+    gradcam_path = None
     
 
 
