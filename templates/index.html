@@ -240,6 +240,16 @@ border-radius:10px;
     Predict
 </button>
 
+<a href="/history">
+
+<button>
+
+View History
+
+</button>
+
+</a>
+
 <div id="loader" style="
 display:none;
 margin-top:20px;
@@ -299,13 +309,7 @@ animation:spin 1s linear infinite;
     margin-top:15px;
     ">
 
-        <div style="
-        width: {{ confidence_width }}%;
-        background:#3b82f6;
-        padding:10px;
-        border-radius:20px;
-        text-align:center;
-        ">
+        <div style="width: {{ confidence_width }}{{ '%' }}; background: #3b82f6; padding: 10px; border-radius: 20px; text-align: center;">
 
         {{ confidence }}%
 
@@ -321,6 +325,14 @@ animation:spin 1s linear infinite;
     <h3>Grad-CAM Visualization</h3>
 
     <img src="{{ gradcam_path }}" alt="GradCAM">
+
+    <a href="/static/report.txt" download>
+
+<button style="margin-top:20px;">
+Download Report
+</button>
+
+</a>
 
 </div>
 
