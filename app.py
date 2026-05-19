@@ -30,7 +30,17 @@ os.makedirs(
     exist_ok=True
 )
 
-model = load_model("mobilenet_pneumonia.keras")
+model = None
+
+def get_model():
+    global model
+
+    if model is None:
+        model = load_model(
+            "mobilenet_pneumonia.keras"
+        )
+
+    return model
 
 IMG_SIZE = 224
 
@@ -140,7 +150,9 @@ def predict():
 
     img_array = np.expand_dims(img_array, axis = 0)
 
-    prediction = model.predict(img_array)[0][0]
+    prediction = get_model().predict(
+    img_array
+)[0][0]
     gradcam_path = None
     
 
